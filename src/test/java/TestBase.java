@@ -60,8 +60,8 @@ public class TestBase {
         return Files.readAllBytes(Paths.get("C:\\AppiumLecture1\\allure-results", "environment.properties"));
     }
 
-   // @AfterClass
-    /*public static void killEmulator(){
+    @AfterClass
+    public static void killEmulator(){
         //kill emulator
         try{
             var newDir = "D:\\AndroidSdk\\platform-tools";
@@ -74,5 +74,5 @@ public class TestBase {
         }catch (InterruptedException e){
             e.printStackTrace();
         }
-    }*/
+    }
 }
