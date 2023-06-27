@@ -9,9 +9,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 
-public class GmailTests extends TestBase{
+public class GmailTests extends BaseConfigurations {
     private AndroidDriver driver;
     private PermissionLayout permission;
     private WelcomeGmailScreen welcomeGmailScreen;

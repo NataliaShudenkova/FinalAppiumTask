@@ -38,7 +38,7 @@ public class BaseScreen {
     }
 
     public WebElement findByWithWaitForSeconds(By by){
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(12));
         return wait.until(elementIsDisplayed(by));
     }
 

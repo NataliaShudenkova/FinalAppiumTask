@@ -1,4 +1,4 @@
-import Screens.Layouts.PermissionLayout;
+
 import io.appium.java_client.android.AndroidDriver;
 import io.qameta.allure.Attachment;
 import io.qameta.allure.Step;
@@ -15,11 +15,10 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.time.Duration;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public class TestBase {
+public class BaseConfigurations {
     private AndroidDriver driver;
 
     public AndroidDriver driverSetUp() throws MalformedURLException {
@@ -60,7 +59,7 @@ public class TestBase {
         return Files.readAllBytes(Paths.get("C:\\AppiumLecture1\\allure-results", "environment.properties"));
     }
 
-    @AfterClass
+    /*@AfterClass
     public static void killEmulator(){
         //kill emulator
         try{
@@ -74,5 +73,5 @@ public class TestBase {
         }catch (InterruptedException e){
             e.printStackTrace();
         }
-    }
+    }*/
 }
