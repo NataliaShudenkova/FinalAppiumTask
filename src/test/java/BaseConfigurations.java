@@ -35,7 +35,6 @@ public class BaseConfigurations {
         caps.setCapability("avdReadyTimeout","60000");
         caps.setCapability("appPackage", "com.google.android.gm");
         caps.setCapability("appActivity","com.google.android.gm.ConversationListActivityGmail");
-        caps.setCapability("timeZone", "GMT+0200");
         driver = new AndroidDriver(driverUrl, caps);
         return driver;
     }
@@ -59,7 +58,7 @@ public class BaseConfigurations {
         return Files.readAllBytes(Paths.get("C:\\AppiumLecture1\\allure-results", "environment.properties"));
     }
 
-    /*@AfterClass
+    @AfterClass
     public static void killEmulator(){
         //kill emulator
         try{
@@ -73,5 +72,5 @@ public class BaseConfigurations {
         }catch (InterruptedException e){
             e.printStackTrace();
         }
-    }*/
+    }
 }

@@ -38,12 +38,7 @@ public class BaseScreen {
     }
 
     public WebElement findByWithWaitForSeconds(By by){
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(12));
-        return wait.until(elementIsDisplayed(by));
-    }
-
-    public WebElement findByWithWaitForMinute(By by){
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMinutes(1));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(13));
         return wait.until(elementIsDisplayed(by));
     }
 
@@ -72,8 +67,7 @@ public class BaseScreen {
 
     public String setSubjectXpath(String subjectName){
         SubjectName = subjectName;
-        var xpath = String.format("//*[contains(@text, '%s')]", subjectName);
-        return xpath;
+        return String.format("//*[contains(@text, '%s')]", subjectName);
     }
 
     @Step("Find letter by Subject text")

@@ -2,9 +2,12 @@ import Screens.*;
 import Screens.Layouts.GmailNavigationDrawer;
 import Screens.Layouts.PermissionLayout;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.connection.ConnectionState;
 import io.qameta.allure.*;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
+import org.openqa.selenium.By;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.time.*;
@@ -19,17 +22,19 @@ public class GmailTests extends BaseConfigurations {
     private CreateGmailLetterScreen createGmailLetterScreen;
     private GmailNavigationDrawer gmailNavigationDrawer;
     private GmailTrashScreen gmailTrashScreen;
-    private String emailAddress = "natalia.test0328@gmail.com";
+    private BaseScreen baseScreen;
+    private final String emailAddress = "natalia.test0328@gmail.com";
     protected String emailSubject = "Automation Letter";
     protected String emailSubjectForDeleting = "Letter For Deleting";
     private String subjectName;
-    private String emailText = "Hello!";
+    private final String emailText = "Hello!";
 
 
     @Before
     @Step("Set up")
     public void pageSetUp() throws MalformedURLException {
         driver = driverSetUp();
+        baseScreen = new BaseScreen(driver);
         permission = new PermissionLayout(driver);
         welcomeGmailScreen = new WelcomeGmailScreen(driver);
         gmailListScreen = new GmailListScreen(driver);
@@ -54,9 +59,9 @@ public class GmailTests extends BaseConfigurations {
     };
 
     @Test
-    @Description("Send Email")
+    @Description("Send Email. WiFi = Off/On")
     @Feature("Gmail")
-    @Story("Gmail_SendEmail")
+    @Story("Gmail_SendEmail_WiFi")
     @TmsLink("123456")
     public void SendEmailTest(){
         subjectName = emailSubject;
@@ -68,24 +73,36 @@ public class GmailTests extends BaseConfigurations {
         }
 
         gmailIncomeScreen.clickGotItButton();
+        //turn off internet
+        driver.toggleWifi();
+        driver.toggleData();
         gmailIncomeScreen.clickComposeButton();
         createGmailLetterScreen.sendEmail(emailAddress, emailSubject, emailText);
         var expectedTime = LocalTime.now(ZoneId.of("Poland")).format(DateTimeFormatter.ofPattern("h:mm a"));
         gmailIncomeScreen.openGmailNavigationDrawer();
         gmailNavigationDrawer.openPrimaryFolder();
-        Assert.assertTrue("Subject Text is not found.",gmailIncomeScreen.findLetterBySubjectText(emailSubject) != null);
-        Assert.assertTrue("Email Text is not expected.",gmailIncomeScreen.getSnippetText().equals(emailText));
-        Assert.assertTrue("Email Sender is not expected.",gmailIncomeScreen.getSenderText().equals("me"));
+
+        //verify: 'Queued' displayed
+        Assert.assertTrue(String.format("Sender text '%s' is displayed without 'Queued' status.",gmailIncomeScreen.getSenderText()),gmailIncomeScreen.getSenderText().contains("Queued"));
+
+        //turn on Internet
+        driver.toggleWifi();
+        driver.toggleData();
+        gmailIncomeScreen.openGmailNavigationDrawer();
+        gmailNavigationDrawer.openPrimaryFolder();
+        Assert.assertNotNull("Subject Text is not found.",gmailIncomeScreen.findLetterBySubjectText(emailSubject));
+        Assert.assertEquals(String.format("Email Text is not expected. Actual: '%s'", gmailIncomeScreen.getSnippetText()),gmailIncomeScreen.getSnippetText(),emailText);
+        Assert.assertEquals("Email Sender is not expected.",gmailIncomeScreen.getSenderText(),"me");
         var actualTime = gmailIncomeScreen.getTimeText();
-        Assert.assertTrue("Actual Time is wrong.",expectedTime.equals(actualTime));
+        Assert.assertEquals("Actual Time is wrong.",expectedTime, actualTime);
     }
 
     @Test
-    @Description("Send Email")
+    @Description("Delete Email")
     @Feature("Gmail")
     @Story("Gmail_DeleteEmail")
     @TmsLink("123457")
-    public void DeleteEmailTest() throws InterruptedException{
+    public void DeleteEmailTest(){
         subjectName = emailSubjectForDeleting;
         if(permission.isPermissionLayoutDisplayed()){
             permission.clickAllowButton();
@@ -99,19 +116,25 @@ public class GmailTests extends BaseConfigurations {
         gmailIncomeScreen.openGmailNavigationDrawer();
         gmailNavigationDrawer.openPrimaryFolder();
         gmailIncomeScreen.deleteLetter(emailSubjectForDeleting);
-        Assert.assertTrue("Letter is not deleted.",gmailIncomeScreen.IncomeScreen_Subject_Label(emailSubjectForDeleting) == null);
+        Assert.assertNull("Letter is not deleted.",gmailIncomeScreen.IncomeScreen_Subject_Label(emailSubjectForDeleting));
 
         gmailIncomeScreen.openGmailNavigationDrawer();
         gmailNavigationDrawer.openTrashFolder();
         gmailTrashScreen.findLetterBySubjectText(emailSubjectForDeleting);
-        Assert.assertTrue("Letter is not in Trash Folder.", gmailTrashScreen.IncomeScreen_Subject_Label(emailSubjectForDeleting) != null);
+        Assert.assertNotNull("Letter is not in Trash Folder.", gmailTrashScreen.IncomeScreen_Subject_Label(emailSubjectForDeleting));
 
     }
 
     @After
     @Step("Tear down")
     public void driverTearDown(){
-        var baseScreen = new BaseScreen(driver);
+        ConnectionState state = driver.getConnection();
+
+        if (!state.isWiFiEnabled()){
+            driver.toggleWifi();
+            driver.toggleData();
+        }
+
         baseScreen.openGmailNavigationDrawer();
         gmailNavigationDrawer.openPrimaryFolder();
 
@@ -122,8 +145,5 @@ public class GmailTests extends BaseConfigurations {
         baseScreen.openGmailNavigationDrawer();
         gmailNavigationDrawer.openTrashFolder();
         gmailTrashScreen.clearTrashFolder();
-        driver.quit();
     }
-
-
 }
